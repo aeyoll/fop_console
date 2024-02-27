@@ -22,12 +22,14 @@ namespace FOP\Console\Commands\Image;
 
 use Configuration;
 use Db;
+use FeatureFlag;
 use FOP\Console\Command;
 use Image;
 use ImageManager;
 use ImageType;
 use Language;
 use Module;
+use PrestaShop\PrestaShop\Core\FeatureFlag\FeatureFlagSettings;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -264,6 +266,14 @@ abstract class ImageGenerateAbstract extends Command
 
         $generate_hight_dpi_images = (bool) Configuration::get('PS_HIGHT_DPI');
 
+        $isMultipleImageFormatFeatureActive = FeatureFlag::isEnabled(FeatureFlagSettings::FEATURE_FLAG_MULTIPLE_IMAGE_FORMAT);
+
+        if ($isMultipleImageFormatFeatureActive) {
+            $configuredImageFormats = explode(',', Configuration::get('PS_IMAGE_FORMAT'));
+        } else {
+            $configuredImageFormats = ['jpg'];
+        }
+
         if (!$productsImages) {
             $formated_medium = ImageType::getFormattedName('medium');
             foreach (scandir($dir, SCANDIR_SORT_NONE) as $image) {
@@ -279,16 +289,18 @@ abstract class ImageGenerateAbstract extends Command
                             $image = str_replace('.', '_thumb.', $image);
                         }
 
-                        if (!file_exists($newDir . substr($image, 0, -4) . '-' . stripslashes($imageType['name']) . '.jpg')) {
-                            if (!file_exists($dir . $image) || !filesize($dir . $image)) {
-                                $this->errors[] = sprintf('Source file does not exist or is empty (%s)', $dir . $image);
-                            } elseif (!ImageManager::resize($dir . $image, $newDir . substr(str_replace('_thumb.', '.', $image), 0, -4) . '-' . stripslashes($imageType['name']) . '.jpg', (int) $imageType['width'], (int) $imageType['height'])) {
-                                $this->errors[] = sprintf('Failed to resize image file (%s)', $dir . $image);
-                            }
+                        foreach ($configuredImageFormats as $imageFormat) {
+                            if (!file_exists($newDir . substr($image, 0, -4) . '-' . stripslashes($imageType['name']) . '.' . $imageFormat)) {
+                                if (!file_exists($dir . $image) || !filesize($dir . $image)) {
+                                    $this->errors[] = sprintf('Source file does not exist or is empty (%s)', $dir . $image);
+                                } elseif (!ImageManager::resize($dir . $image, $newDir . substr(str_replace('_thumb.', '.', $image), 0, -4) . '-' . stripslashes($imageType['name']) . '.' . $imageFormat, (int) $imageType['width'], (int) $imageType['height'], $imageFormat)) {
+                                    $this->errors[] = sprintf('Failed to resize image file (%s)', $dir . $image);
+                                }
 
-                            if ($generate_hight_dpi_images) {
-                                if (!ImageManager::resize($dir . $image, $newDir . substr($image, 0, -4) . '-' . stripslashes($imageType['name']) . '2x.jpg', (int) $imageType['width'] * 2, (int) $imageType['height'] * 2)) {
-                                    $this->errors[] = sprintf('Failed to resize image file to high resolution %s', $dir . $image);
+                                if ($generate_hight_dpi_images) {
+                                    if (!ImageManager::resize($dir . $image, $newDir . substr($image, 0, -4) . '-' . stripslashes($imageType['name']) . '2x.' . $imageFormat, (int) $imageType['width'] * 2, (int) $imageType['height'] * 2, $imageFormat)) {
+                                        $this->errors[] = sprintf('Failed to resize image file to high resolution %s', $dir . $image);
+                                    }
                                 }
                             }
                         }
@@ -301,22 +313,24 @@ abstract class ImageGenerateAbstract extends Command
                 $existing_img = $dir . $imageObj->getExistingImgPath() . '.jpg';
                 if (file_exists($existing_img) && filesize($existing_img)) {
                     foreach ($type as $imageType) {
-                        if (!file_exists($dir . $imageObj->getExistingImgPath() . '-' . stripslashes($imageType['name']) . '.jpg')) {
-                            if (!ImageManager::resize($existing_img, $dir . $imageObj->getExistingImgPath() . '-' . stripslashes($imageType['name']) . '.jpg', (int) $imageType['width'], (int) $imageType['height'])) {
-                                $this->errors[] = sprintf(
-                                    'Original image is corrupt %s for product ID %s or bad permission on folder.',
-                                    $existing_img,
-                                    (int) $imageObj->id_product
-                                );
-                            }
-
-                            if ($generate_hight_dpi_images) {
-                                if (!ImageManager::resize($existing_img, $dir . $imageObj->getExistingImgPath() . '-' . stripslashes($imageType['name']) . '2x.jpg', (int) $imageType['width'] * 2, (int) $imageType['height'] * 2)) {
+                        foreach ($configuredImageFormats as $imageFormat) {
+                            if (!file_exists($dir . $imageObj->getExistingImgPath() . '-' . stripslashes($imageType['name']) . '.' . $imageFormat)) {
+                                if (!ImageManager::resize($existing_img, $dir . $imageObj->getExistingImgPath() . '-' . stripslashes($imageType['name']) . '.' . $imageFormat, (int) $imageType['width'], (int) $imageType['height'], $imageFormat)) {
                                     $this->errors[] = sprintf(
                                         'Original image is corrupt %s for product ID %s or bad permission on folder.',
                                         $existing_img,
                                         (int) $imageObj->id_product
                                     );
+                                }
+
+                                if ($generate_hight_dpi_images) {
+                                    if (!ImageManager::resize($existing_img, $dir . $imageObj->getExistingImgPath() . '-' . stripslashes($imageType['name']) . '2x.' . $imageFormat, (int) $imageType['width'] * 2, (int) $imageType['height'] * 2, $imageFormat)) {
+                                        $this->errors[] = sprintf(
+                                            'Original image is corrupt %s for product ID %s or bad permission on folder.',
+                                            $existing_img,
+                                            (int) $imageObj->id_product
+                                        );
+                                    }
                                 }
                             }
                         }
