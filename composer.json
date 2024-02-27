@@ -1,6 +1,6 @@
 {
-  "name": "friends-of-presta/fop_console",
-  "description": "Add some console commands for PrestaShop 1.7.5+",
+  "name": "aeyoll/fop_console",
+  "description": "Add some console commands for PrestaShop 8.0.0+",
   "authors": [
     {
       "name": "Friends of Presta",

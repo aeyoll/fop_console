@@ -1,11 +1,11 @@
 [![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%207.2-8892BF.svg?style=flat-square)](https://php.net/)
-[![PHP tests](https://github.com/friends-of-presta/fop_console/actions/workflows/phpstan.yml/badge.svg)](https://github.com/friends-of-presta/fop_console/blob/dev/.github/workflows/phpstan.yml)
-[![GitHub release](https://img.shields.io/github/v/release/friends-of-presta/fop_console)](https://github.com/friends-of-presta/fop_console/releases)
-[![Slack chat](https://img.shields.io/badge/Chat-on%20Slack-red)](https://github.com/friends-of-presta/who-we-are#what-we-do)
+[![PHP tests](https://github.com/aeyoll/fop_console/actions/workflows/phpstan.yml/badge.svg)](https://github.com/aeyoll/fop_console/blob/dev/.github/workflows/phpstan.yml)
+[![GitHub release](https://img.shields.io/github/v/release/aeyoll/fop_console)](https://github.com/aeyoll/fop_console/releases)
+[![Slack chat](https://img.shields.io/badge/Chat-on%20Slack-red)](https://github.com/aeyoll/who-we-are#what-we-do)
 
 # Friends of Presta Console
 
-Fop console is a module which provides a set a commands to extend PrestaShop 1.7 commands.
+Fop console is a module which provides a set a commands to extend PrestaShop 8.0 commands.
 
 Since version 1.7.5.0 [Prestashop provides some terminal commands](https://devdocs.prestashop.com/1.7/modules/concepts/commands/) using the [Symfony console tool](https://symfony.com/doc/3.4/console.html).
 
@@ -14,13 +14,13 @@ These commands are mainly for developers, just some basic knowledge of command l
 
 ## Install from release (recommended)
 
-[Donwload a zip release](https://github.com/friends-of-presta/fop_console/releases) and install it like any other module.
+[Donwload a zip release](https://github.com/aeyoll/fop_console/releases) and install it like any other module.
 
 Alternatively, run this in a shell :
 
 ```bash
 #!/bin/bash
-wget https://git.io/JMF3q --output-document /tmp/fop_console.zip && unzip /tmp/fop_console.zip -d modules && ./bin/console pr:mo install fop_console
+wget https://github.com/aeyoll/fop_console/releases/latest/download/fop_console.zip --output-document /tmp/fop_console.zip && unzip /tmp/fop_console.zip -d modules && ./bin/console pr:mo install fop_console
 ```
 
 ## Install from sources
@@ -29,8 +29,8 @@ If you want use the dev branch, you can install from github.
 If you want to contribute, first create a fork and follow the same steps using your forked repository url instead of the original one.
 
 ```
-cd modules 
-git clone https://github.com/friends-of-presta/fop_console.git
+cd modules
+git clone https://github.com/aeyoll/fop_console.git
 cd fop_console
 composer install
 ```
@@ -104,7 +104,7 @@ final class DomainAction extends Command
         $this
             ->setName('fop:domain') // e.g 'fop:export'
             // or
-            ->setName('fop:domain:action') // e.g 'fop:configuration:export' 
+            ->setName('fop:domain:action') // e.g 'fop:configuration:export'
             ->setDescription('Describe the command on a user perspective.');
     }
 
@@ -151,7 +151,7 @@ You are ready to go !
 Any contributions are very welcome :)
 First [install from sources](/README.md#install-from-sources) and see [Contributing](/CONTRIBUTING.md) for details.
 
-[Current contributors](https://github.com/friends-of-presta/fop_console/graphs/contributors) or [contributors](/CONTRIBUTORS.md).
+[Current contributors](https://github.com/aeyoll/fop_console/graphs/contributors) or [contributors](/CONTRIBUTORS.md).
 
 ## Compatibility
 
