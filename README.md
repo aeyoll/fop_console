@@ -5,7 +5,7 @@
 
 # Friends of Presta Console
 
-Fop console is a module which provides a set a commands to extend PrestaShop 8.0 commands.
+Fop console is a module which provides a set a commands to extend PrestaShop 8.1 commands.
 
 Since version 1.7.5.0 [Prestashop provides some terminal commands](https://devdocs.prestashop.com/1.7/modules/concepts/commands/) using the [Symfony console tool](https://symfony.com/doc/3.4/console.html).
 
